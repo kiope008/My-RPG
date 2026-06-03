@@ -63,6 +63,16 @@
             transform: translateY(-2px);
         }
 
+        /* Estilo especial para o botão de escolha personalizada */
+        .dice-btn.custom {
+            background-color: #0f3460;
+            border-color: #8f94fb;
+        }
+        .dice-btn.custom:hover {
+            background-color: #8f94fb;
+            color: #1a1a2e;
+        }
+
         .dice-btn:active {
             transform: translateY(1px);
         }
@@ -94,7 +104,6 @@
             margin-top: 5px;
         }
 
-        /* Animaçãozinha marota de tremer ao rolar */
         .shake {
             animation: shakeAnima 0.15s ease-in-out alternate 2;
         }
@@ -117,7 +126,7 @@
 <body>
 
     <h1>Taça de Dados RPG</h1>
-    <p class="subtitle">Escolha seu dado e que a sorte esteja com você!</p>
+    <p class="subtitle">Escolha seu dado ou crie o seu próprio!</p>
 
     <div class="dice-container">
         <button class="dice-btn" onclick="rolarDado(4)">d4</button>
@@ -125,6 +134,7 @@
         <button class="dice-btn" onclick="rolarDado(8)">d8</button>
         <button class="dice-btn" onclick="rolarDado(12)">d12</button>
         <button class="dice-btn" onclick="rolarDado(20)">d20</button>
+        <button class="dice-btn custom" onclick="perguntarLados()">Outro...</button>
     </div>
 
     <div class="result-display" id="dice-box">
@@ -138,25 +148,37 @@
             const displayType = document.getElementById('result-type');
             const diceBox = document.getElementById('dice-box');
 
-            // Adiciona efeito de tremer a caixa do resultado
             diceBox.classList.remove('shake');
-            void diceBox.offsetWidth; // Truque para resetar a animação do CSS
-            diceBox.classList.add('shake');
+            void diceBox.offsetWidth; 
+            diceBox.add('shake');
 
-            // Lógica do dado: gera um número de 1 até o número de lados
-            const resultado = Math.floor(Math.random() * lados) + 1;
+            const resultado = Math.floor(Math.random() * dados) + 1;
 
-            // Atualiza a tela com o resultado
             displayValue.textContent = resultado;
             displayType.textContent = 'd' + lados;
 
-            // Destaca se for um acerto crítico (20 no d20) ou erro crítico (1 no d20)
             if (lados === 20 && resultado === 20) {
-                displayValue.style.color = '#00ffcc'; // Crítico brilha em verde/ciano
+                displayValue.style.color = '#00ffcc'; 
             } else if (lados === 20 && resultado === 1) {
-                displayValue.style.color = '#ff4a4a'; // Erro crítico brilha em vermelho
+                displayValue.style.color = '#ff4a4a'; 
             } else {
-                displayValue.style.color = '#fff'; // Cor normal
+                displayValue.style.color = '#fff'; 
+            }
+        }
+
+        // Nova função que pergunta o número de lados pro jogador
+        function perguntarLados() {
+            const resposta = prompt("Quantos lados você quer que o dado tenha?");
+            
+            // Converte o texto digitado em um número inteiro
+            const quantidadeLados = parseInt(resposta);
+
+            // Verifica se o usuário digitou um número válido e maior que zero
+            if (!isNaN(quantidadeLados) && quantidadeLados > 0) {
+                rolarDado(quantidadeLados);
+            } else if (resposta !== null) {
+                // Se não for um número válido (e ele não tiver clicado em "Cancelar")
+                alert("Por favor, digite apenas números inteiros maiores que 0!");
             }
         }
     </script>
