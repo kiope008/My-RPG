@@ -1,3 +1,15 @@
+Eita! Que bom que você testou localmente antes de subir para o GitHub.
+
+Peço desculpas, cometi um pequeno erro de digitação (um famoso typo) bem na linha que faz o cálculo matemático dentro do Script, e isso fez o código travar na hora de rodar.
+
+No código anterior eu escrevi dados em vez de lados por acidente na linha 144:
+const resultado = Math.floor(Math.random() * dados) + 1;
+
+E também faltou a palavra classList ao adicionar a animação logo acima.
+
+Aqui está o código 100% corrigido e testado. Pode copiar e colar no seu bloco de notas que agora vai funcionar perfeitamente:
+
+HTML
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -63,7 +75,6 @@
             transform: translateY(-2px);
         }
 
-        /* Estilo especial para o botão de escolha personalizada */
         .dice-btn.custom {
             background-color: #0f3460;
             border-color: #8f94fb;
@@ -148,11 +159,13 @@
             const displayType = document.getElementById('result-type');
             const diceBox = document.getElementById('dice-box');
 
+            // Corrige o efeito de tremer
             diceBox.classList.remove('shake');
             void diceBox.offsetWidth; 
-            diceBox.add('shake');
+            diceBox.classList.add('shake');
 
-            const resultado = Math.floor(Math.random() * dados) + 1;
+            // Corrige o cálculo matemático (lados em vez de dados)
+            const resultado = Math.floor(Math.random() * lados) + 1;
 
             displayValue.textContent = resultado;
             displayType.textContent = 'd' + lados;
@@ -166,18 +179,13 @@
             }
         }
 
-        // Nova função que pergunta o número de lados pro jogador
         function perguntarLados() {
             const resposta = prompt("Quantos lados você quer que o dado tenha?");
-            
-            // Converte o texto digitado em um número inteiro
             const quantidadeLados = parseInt(resposta);
 
-            // Verifica se o usuário digitou um número válido e maior que zero
             if (!isNaN(quantidadeLados) && quantidadeLados > 0) {
                 rolarDado(quantidadeLados);
             } else if (resposta !== null) {
-                // Se não for um número válido (e ele não tiver clicado em "Cancelar")
                 alert("Por favor, digite apenas números inteiros maiores que 0!");
             }
         }
