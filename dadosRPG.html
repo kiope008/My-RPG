@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dados de RPG</title>
+    <title>Dados de RPG - Lysander</title>
     <style>
         * {
             margin: 0;
@@ -32,7 +32,7 @@
 
         p.subtitle {
             color: #8f94fb;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             font-size: 1.1rem;
         }
 
@@ -42,7 +42,7 @@
             justify-content: center;
             gap: 15px;
             max-width: 600px;
-            margin-bottom: 40px;
+            margin-bottom: 25px;
         }
 
         .dice-btn {
@@ -73,22 +73,46 @@
             color: #1a1a2e;
         }
 
-        .dice-btn:active {
-            transform: translateY(1px);
+        /* Estilos do botão de sequência */
+        .sequence-container {
+            margin-bottom: 30px;
+        }
+
+        .seq-btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
+        }
+
+        .seq-btn.active {
+            background-color: #dc3545;
+            box-shadow: 0 4px 10px rgba(220, 53, 69, 0.4);
         }
 
         .result-display {
             background-color: #16213e;
             border: 3px solid #e94560;
             border-radius: 12px;
-            width: 200px;
-            height: 200px;
+            width: 220px;
+            height: 220px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             box-shadow: 0 8px 16px rgba(0,0,0,0.5);
-            transition: transform 0.1s ease;
+            transition: all 0.1s ease;
+        }
+
+        /* Destaca a caixa quando está somando */
+        .result-display.accumulating {
+            border-color: #28a745;
         }
 
         #result-value {
@@ -102,6 +126,8 @@
             font-size: 1.2rem;
             color: #8f94fb;
             margin-top: 5px;
+            text-align: center;
+            max-width: 90%;
         }
 
         .shake {
@@ -126,7 +152,7 @@
 <body>
 
     <h1>Taça de Dados RPG</h1>
-    <p class="subtitle">Escolha seu dado ou crie o seu próprio!</p>
+    <p class="subtitle">Grimório Digital do Lysander</p>
 
     <div class="dice-container">
         <button class="dice-btn" onclick="rolarDado(4)">d4</button>
@@ -137,34 +163,90 @@
         <button class="dice-btn custom" onclick="perguntarLados()">Outro...</button>
     </div>
 
+    <div class="sequence-container">
+        <button id="btn-sequencia" class="seq-btn" onclick="alternarSequencia()">Iniciar Sequência</button>
+    </div>
+
     <div class="result-display" id="dice-box">
         <div id="result-value">-</div>
         <div id="result-type">Rolagem</div>
     </div>
 
     <script>
+        // Variáveis de controle do Modo Sequência
+        let emSequencia = false;
+        let somaSequencia = 0;
+        let dadosRolados = [];
+
         function rolarDado(lados) {
             const displayValue = document.getElementById('result-value');
             const displayType = document.getElementById('result-type');
             const diceBox = document.getElementById('dice-box');
 
-            // Corrige o efeito de tremer
+            // Efeito de tremer a caixinha
             diceBox.classList.remove('shake');
             void diceBox.offsetWidth; 
             diceBox.classList.add('shake');
 
-            // Corrige o cálculo matemático (lados em vez de dados)
+            // Cálculo do dado
             const resultado = Math.floor(Math.random() * lados) + 1;
 
-            displayValue.textContent = resultado;
-            displayType.textContent = 'd' + lados;
-
-            if (lados === 20 && resultado === 20) {
-                displayValue.style.color = '#00ffcc'; 
-            } else if (lados === 20 && resultado === 1) {
-                displayValue.style.color = '#ff4a4a'; 
+            if (emSequencia) {
+                // Se estiver no modo sequência, acumula o valor
+                somaSequencia += resultado;
+                dadosRolados.push('d' + lados + '(' + resultado + ')');
+                
+                // Mostra o resultado atual e o que já foi rolado
+                displayValue.textContent = resultado;
+                displayType.textContent = "Soma atual: " + somaSequencia;
             } else {
-                displayValue.style.color = '#fff'; 
+                // Modo normal de rolagem única
+                displayValue.textContent = resultado;
+                displayType.textContent = 'd' + lados;
+
+                // Cores especiais para o d20 normal
+                if (lados === 20 && resultado === 20) {
+                    displayValue.style.color = '#00ffcc'; 
+                } else if (lados === 20 && resultado === 1) {
+                    displayValue.style.color = '#ff4a4a'; 
+                } else {
+                    displayValue.style.color = '#fff'; 
+                }
+            }
+        }
+
+        // Função que liga e desliga a sequência
+        function alternarSequencia() {
+            const btn = document.getElementById('btn-sequencia');
+            const diceBox = document.getElementById('dice-box');
+            const displayValue = document.getElementById('result-value');
+            const displayType = document.getElementById('result-type');
+
+            if (!emSequencia) {
+                // LIGA A SEQUÊNCIA
+                emSequencia = true;
+                somaSequencia = 0;
+                dadosRolados = [];
+                
+                btn.textContent = "Encerrar Sequência";
+                btn.classList.add('active');
+                diceBox.classList.add('accumulating');
+                
+                displayValue.textContent = "0";
+                displayType.textContent = "Modo Sequência Ativo";
+                displayValue.style.color = '#28a745'; // Cor verde para indicar o modo
+            } else {
+                // DESLIGA A SEQUÊNCIA E MOSTRA O TOTAL
+                emSequencia = false;
+                
+                btn.textContent = "Iniciar Sequência";
+                btn.classList.remove('active');
+                diceBox.classList.remove('accumulating');
+                
+                // Exibe o total final acumulado
+                displayValue.textContent = somaSequencia;
+                displayType.textContent = "Total de: " + dadosRolados.join(' + ');
+                displayValue.style.color = '#fff';
             }
         }
 
