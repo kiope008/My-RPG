@@ -1,179 +1,198 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dados de RPG - Lysander</title>
+    <title>Grimório de Dados - Lysander</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
 
         body {
-            background-color: #1a1a2e;
-            color: #e2e2e2;
+            background: linear-gradient(135deg, #111122 0%, #1a1a3a 100%);
+            color: #f0f2f5;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            padding: 20px;
+            padding: 24px;
+        }
+
+        .app-container {
+            background-color: rgba(30, 30, 60, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
         }
 
         h1 {
-            color: #e94560;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            color: #fff;
+            font-size: 2rem;
+            margin-bottom: 6px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
         }
 
         p.subtitle {
-            color: #8f94fb;
-            margin-bottom: 25px;
-            font-size: 1.1rem;
+            color: #9d9eff;
+            margin-bottom: 30px;
+            font-size: 1rem;
+            font-weight: 500;
         }
 
-        .dice-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 15px;
-            max-width: 600px;
-            margin-bottom: 25px;
+        .dice-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            width: 100%;
+            margin-bottom: 24px;
         }
 
         .dice-btn {
-            background-color: #16213e;
+            background: #25254e;
             color: #fff;
-            border: 2px solid #0f3460;
-            padding: 15px 25px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 12px;
             cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
         }
 
         .dice-btn:hover {
-            background-color: #0f3460;
-            border-color: #e94560;
+            background: #313168;
+            border-color: #8f94fb;
             transform: translateY(-2px);
         }
 
         .dice-btn.custom {
-            background-color: #0f3460;
-            border-color: #8f94fb;
+            background: linear-gradient(135deg, #4e54c8 0%, #8f94fb 100%);
+            border: none;
         }
+        
         .dice-btn.custom:hover {
-            background-color: #8f94fb;
-            color: #1a1a2e;
+            filter: brightness(1.1);
+            border-color: transparent;
         }
 
-        /* Estilos do botão de sequência */
-        .sequence-container {
+        .dice-btn:active {
+            transform: translateY(1px);
+        }
+
+        .sequence-box {
+            width: 100%;
             margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
         }
 
         .seq-btn {
-            background-color: #28a745;
+            background-color: #218838;
             color: white;
             border: none;
-            padding: 12px 30px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            border-radius: 25px;
+            padding: 12px 32px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 50px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(33, 136, 56, 0.3);
+            width: 100%;
         }
 
         .seq-btn.active {
-            background-color: #dc3545;
-            box-shadow: 0 4px 10px rgba(220, 53, 69, 0.4);
+            background-color: #c82333;
+            box-shadow: 0 4px 15px rgba(200, 35, 51, 0.3);
         }
 
-        .result-display {
-            background-color: #16213e;
-            border: 3px solid #e94560;
-            border-radius: 12px;
-            width: 220px;
-            height: 220px;
+        .result-card {
+            background: rgba(15, 15, 35, 0.8);
+            border: 2px solid #3c3c78;
+            border-radius: 16px;
+            width: 100%;
+            padding: 30px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.5);
-            transition: all 0.1s ease;
+            min-height: 180px;
+            box-shadow: inset 0 4px 20px rgba(0,0,0,0.5);
+            transition: border-color 0.3s ease;
         }
 
-        /* Destaca a caixa quando está somando */
-        .result-display.accumulating {
-            border-color: #28a745;
+        .result-card.accumulating {
+            border-color: #218838;
         }
 
         #result-value {
-            font-size: 4rem;
-            font-weight: bold;
+            font-size: 4.5rem;
+            font-weight: 700;
             color: #fff;
             line-height: 1;
+            margin-bottom: 8px;
+            transition: color 0.2s ease;
         }
 
         #result-type {
-            font-size: 1.2rem;
-            color: #8f94fb;
-            margin-top: 5px;
+            font-size: 1rem;
+            color: #a5a6f6;
+            font-weight: 500;
             text-align: center;
-            max-width: 90%;
+            line-height: 1.4;
         }
 
         .shake {
-            animation: shakeAnima 0.15s ease-in-out alternate 2;
+            animation: softShake 0.2s ease-in-out;
         }
 
-        @keyframes shakeAnima {
-            0% { transform: translate(2px, 1px) rotate(0deg); }
-            10% { transform: translate(-1px, -2px) rotate(-1deg); }
-            20% { transform: translate(-3px, 0px) rotate(1deg); }
-            30% { transform: translate(0px, 2px) rotate(0deg); }
-            40% { transform: translate(1px, -1px) rotate(1deg); }
-            50% { transform: translate(-1px, 2px) rotate(-1deg); }
-            60% { transform: translate(-3px, 1px) rotate(0deg); }
-            70% { transform: translate(2px, 1px) rotate(-1deg); }
-            80% { transform: translate(-1px, -1px) rotate(1deg); }
-            90% { transform: translate(2px, 2px) rotate(0deg); }
-            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        @keyframes softShake {
+            0% { transform: scale(1); }
+            30% { transform: scale(0.92) rotate(-2deg); }
+            70% { transform: scale(1.05) rotate(2deg); }
+            100% { transform: scale(1) rotate(0deg); }
         }
     </style>
 </head>
 <body>
 
-    <h1>Taça de Dados RPG</h1>
-    <p class="subtitle">Grimório Digital do Lysander</p>
+    <div class="app-container">
+        <h1>Taça de Dados</h1>
+        <p class="subtitle">Grimório de Lysander Arcanum</p>
 
-    <div class="dice-container">
-        <button class="dice-btn" onclick="rolarDado(4)">d4</button>
-        <button class="dice-btn" onclick="rolarDado(6)">d6</button>
-        <button class="dice-btn" onclick="rolarDado(8)">d8</button>
-        <button class="dice-btn" onclick="rolarDado(12)">d12</button>
-        <button class="dice-btn" onclick="rolarDado(20)">d20</button>
-        <button class="dice-btn custom" onclick="perguntarLados()">Outro...</button>
-    </div>
+        <div class="dice-grid">
+            <button class="dice-btn" onclick="rolarDado(4)">d4</button>
+            <button class="dice-btn" onclick="rolarDado(6)">d6</button>
+            <button class="dice-btn" onclick="rolarDado(8)">d8</button>
+            <button class="dice-btn" onclick="rolarDado(12)">d12</button>
+            <button class="dice-btn" onclick="rolarDado(20)">d20</button>
+            <button class="dice-btn custom" onclick="perguntarLados()">Outro</button>
+        </div>
 
-    <div class="sequence-container">
-        <button id="btn-sequencia" class="seq-btn" onclick="alternarSequencia()">Iniciar Sequência</button>
-    </div>
+        <div class="sequence-box">
+            <button id="btn-sequencia" class="seq-btn" onclick="alternarSequencia()">Iniciar Sequência</button>
+        </div>
 
-    <div class="result-display" id="dice-box">
-        <div id="result-value">-</div>
-        <div id="result-type">Rolagem</div>
+        <div class="result-card" id="dice-box">
+            <div id="result-value">-</div>
+            <div id="result-type">Pronto para rolar</div>
+        </div>
     </div>
 
     <script>
-        // Variáveis de controle do Modo Sequência
         let emSequencia = false;
         let somaSequencia = 0;
         let dadosRolados = [];
@@ -183,28 +202,23 @@
             const displayType = document.getElementById('result-type');
             const diceBox = document.getElementById('dice-box');
 
-            // Efeito de tremer a caixinha
+            // Feedback visual de clique mais suave
             diceBox.classList.remove('shake');
             void diceBox.offsetWidth; 
             diceBox.classList.add('shake');
 
-            // Cálculo do dado
             const resultado = Math.floor(Math.random() * lados) + 1;
 
             if (emSequencia) {
-                // Se estiver no modo sequência, acumula o valor
                 somaSequencia += resultado;
                 dadosRolados.push('d' + lados + '(' + resultado + ')');
                 
-                // Mostra o resultado atual e o que já foi rolado
                 displayValue.textContent = resultado;
-                displayType.textContent = "Soma atual: " + somaSequencia;
+                displayType.textContent = "Soma acumulada: " + somaSequencia;
             } else {
-                // Modo normal de rolagem única
                 displayValue.textContent = resultado;
-                displayType.textContent = 'd' + lados;
+                displayType.textContent = 'Resultado do d' + lados;
 
-                // Cores especiais para o d20 normal
                 if (lados === 20 && resultado === 20) {
                     displayValue.style.color = '#00ffcc'; 
                 } else if (lados === 20 && resultado === 1) {
@@ -215,7 +229,6 @@
             }
         }
 
-        // Função que liga e desliga a sequência
         function alternarSequencia() {
             const btn = document.getElementById('btn-sequencia');
             const diceBox = document.getElementById('dice-box');
@@ -223,7 +236,6 @@
             const displayType = document.getElementById('result-type');
 
             if (!emSequencia) {
-                // LIGA A SEQUÊNCIA
                 emSequencia = true;
                 somaSequencia = 0;
                 dadosRolados = [];
@@ -234,18 +246,16 @@
                 
                 displayValue.textContent = "0";
                 displayType.textContent = "Modo Sequência Ativo";
-                displayValue.style.color = '#28a745'; // Cor verde para indicar o modo
+                displayValue.style.color = '#28a745';
             } else {
-                // DESLIGA A SEQUÊNCIA E MOSTRA O TOTAL
                 emSequencia = false;
                 
                 btn.textContent = "Iniciar Sequência";
                 btn.classList.remove('active');
                 diceBox.classList.remove('accumulating');
                 
-                // Exibe o total final acumulado
                 displayValue.textContent = somaSequencia;
-                displayType.textContent = "Total de: " + dadosRolados.join(' + ');
+                displayType.textContent = "Total: " + dadosRolados.join(' + ');
                 displayValue.style.color = '#fff';
             }
         }
