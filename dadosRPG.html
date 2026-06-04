@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grimório de Dados - Lysander</title>
+    <title>Grimório Digital - Taça de Dados</title>
     <style>
         * {
             margin: 0;
@@ -86,7 +86,6 @@
         
         .dice-btn.custom:hover {
             filter: brightness(1.1);
-            border-color: transparent;
         }
 
         .dice-btn:active {
@@ -156,13 +155,14 @@
         }
 
         .shake {
-            animation: softShake 0.2s ease-in-out;
+            animation: softShake 0.4s ease-in-out;
         }
 
         @keyframes softShake {
             0% { transform: scale(1); }
-            30% { transform: scale(0.92) rotate(-2deg); }
-            70% { transform: scale(1.05) rotate(2deg); }
+            15% { transform: scale(0.92) rotate(-2deg); }
+            45% { transform: scale(1.05) rotate(2deg); }
+            75% { transform: scale(0.98) rotate(-1deg); }
             100% { transform: scale(1) rotate(0deg); }
         }
     </style>
@@ -171,7 +171,7 @@
 
     <div class="app-container">
         <h1>Taça de Dados</h1>
-        <p class="subtitle">Grimório de Lysander Arcanum</p>
+        <p class="subtitle">Mesa de RPG</p>
 
         <div class="dice-grid">
             <button class="dice-btn" onclick="rolarDado(4)">d4</button>
@@ -196,40 +196,72 @@
         let emSequencia = false;
         let somaSequencia = 0;
         let dadosRolados = [];
+        let rolando = false; // Impede cliques múltiplos durante a animação
 
         function rolarDado(lados) {
+            if (rolando) return; // Trava o botão enquanto os números passam correrndo
+
             const displayValue = document.getElementById('result-value');
             const displayType = document.getElementById('result-type');
             const diceBox = document.getElementById('dice-box');
 
-            // Feedback visual de clique mais suave
+            rolando = true;
+            displayValue.style.color = '#fff';
+
+            // Ativa o pulo visual na caixa
             diceBox.classList.remove('shake');
             void diceBox.offsetWidth; 
             diceBox.classList.add('shake');
 
-            const resultado = Math.floor(Math.random() * lados) + 1;
+            // Resultado real que vai sair no final
+            const resultadoFinal = Math.floor(Math.random() * lados) + 1;
 
-            if (emSequencia) {
-                somaSequencia += resultado;
-                dadosRolados.push('d' + lados + '(' + resultado + ')');
+            //Configuração do efeito dos números passando correndo
+            let duracaoEfeito = 400; // Tempo total passando números (milissegundos)
+            let intervaloTroca = 40; // Velocidade da troca de números
+            let tempoDecorrido = 0;
+
+            let efeitoRoleta = setInterval(() => {
+                // Gera números aleatórios temporários baseados no tamanho do dado
+                let numeroTemporario = Math.floor(Math.random() * lados) + 1;
+                displayValue.textContent = numeroTemporario;
                 
-                displayValue.textContent = resultado;
-                displayType.textContent = "Soma acumulada: " + somaSequencia;
-            } else {
-                displayValue.textContent = resultado;
-                displayType.textContent = 'Resultado do d' + lados;
-
-                if (lados === 20 && resultado === 20) {
-                    displayValue.style.color = '#00ffcc'; 
-                } else if (lados === 20 && resultado === 1) {
-                    displayValue.style.color = '#ff4a4a'; 
+                if (emSequencia) {
+                    displayType.textContent = "Calculando...";
                 } else {
-                    displayValue.style.color = '#fff'; 
+                    displayType.textContent = "Rolando d" + lados + "...";
                 }
-            }
+
+                tempoDecorrido += intervaloTroca;
+
+                // Quando o tempo do efeito acaba, para a roleta e crava o resultado real
+                if (tempoDecorrido >= duracaoEfeito) {
+                    clearInterval(efeitoRoleta);
+                    
+                    displayValue.textContent = resultadoFinal;
+                    rolando = false;
+
+                    if (emSequencia) {
+                        somaSequencia += resultadoFinal;
+                        dadosRolados.push('d' + lados + '(' + resultadoFinal + ')');
+                        displayType.textContent = "Soma acumulada: " + somaSequencia;
+                    } else {
+                        displayType.textContent = 'Resultado do d' + lados;
+
+                        // Cores para d20 Crítico ou Desastre
+                        if (lados === 20 && resultadoFinal === 20) {
+                            displayValue.style.color = '#00ffcc'; 
+                        } else if (lados === 20 && resultadoFinal === 1) {
+                            displayValue.style.color = '#ff4a4a'; 
+                        }
+                    }
+                }
+            }, intervaloTroca);
         }
 
         function alternarSequencia() {
+            if (rolando) return;
+
             const btn = document.getElementById('btn-sequencia');
             const diceBox = document.getElementById('dice-box');
             const displayValue = document.getElementById('result-value');
@@ -261,6 +293,7 @@
         }
 
         function perguntarLados() {
+            if (rolando) return;
             const resposta = prompt("Quantos lados você quer que o dado tenha?");
             const quantidadeLados = parseInt(resposta);
 
